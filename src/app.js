@@ -32,7 +32,7 @@ function setupWelcomeScreen() {
       renderPresets();
       renderSliders();
       initMap();
-      setupTimeHorizonToggle();
+      setupDurationSlider();
       setupRefreshButton();
       startAutoRefresh();
 
@@ -564,17 +564,21 @@ function updateMap(countryImpacts) {
   markers.addTo(leafletMap);
 }
 
-// ── TIME HORIZON TOGGLE ─────────────────────────────────────────────────────
-function setupTimeHorizonToggle() {
-  const container = document.getElementById('time-horizon-toggle');
-  container.querySelectorAll('.toggle-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      engine.setTimeHorizon(btn.dataset.horizon);
+// ── DURATION SLIDER ─────────────────────────────────────────────────────────
+function setupDurationSlider() {
+  const slider = document.getElementById('duration-slider');
+  const display = document.getElementById('duration-display');
+  
+  if (slider && display) {
+    slider.addEventListener('input', (e) => {
+      display.textContent = e.target.value;
+    });
+
+    slider.addEventListener('change', (e) => {
+      engine.setDurationWeeks(parseInt(e.target.value));
       recompute();
     });
-  });
+  }
 }
 
 // ── REFRESH ─────────────────────────────────────────────────────────────────

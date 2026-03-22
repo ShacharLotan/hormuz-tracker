@@ -40,9 +40,12 @@
       </div>
     </div>
     <div class="header-right">
-      <div class="time-horizon-toggle" id="time-horizon-toggle">
-        <button class="toggle-btn active" data-horizon="short">Short-term</button>
-        <button class="toggle-btn" data-horizon="long">Long-term</button>
+      <div class="duration-control">
+        <div class="duration-header">
+          <span class="duration-label">Blockade Duration ⏱️</span>
+          <span class="duration-value"><span id="duration-display">26</span> weeks</span>
+        </div>
+        <input type="range" id="duration-slider" min="1" max="52" value="26" class="duration-track">
       </div>
       <button id="theme-toggle" class="theme-btn" title="Toggle Light/Dark Mode">🌓</button>
       <div class="refresh-section">

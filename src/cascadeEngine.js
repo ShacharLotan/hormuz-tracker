@@ -5,7 +5,7 @@
 
 class CascadeEngine {
   constructor() {
-    this.timeHorizon = 'short'; // 'short' or 'long'
+    this.durationWeeks = 26;
     this.shortages = {};
     Object.keys(COMMODITIES).forEach(k => this.shortages[k] = 0);
     this.results = null;
@@ -16,8 +16,8 @@ class CascadeEngine {
     this.results = null;
   }
 
-  setTimeHorizon(horizon) {
-    this.timeHorizon = horizon;
+  setDurationWeeks(weeks) {
+    this.durationWeeks = weeks;
     this.results = null;
   }
 
@@ -65,10 +65,10 @@ class CascadeEngine {
       // Effective shortage after Hormuz dependency and substitution
       const effectiveShortage = shortagePct * commodity.hormuzDependencyPct * (1 - commodity.substitutionFactor);
 
-      // Time-adjusted multiplier
-      const timeMult = this.timeHorizon === 'short'
-        ? commodity.shortTermMultiplier
-        : commodity.longTermAdaptation;
+      // Time-adjusted multiplier: exponential decay of shock premium based on duration weeks
+      // Week 1-4 = high panic (near shortTerm), Week 52 = fully adapted (near longTerm)
+      const panicPremium = (commodity.shortTermMultiplier - commodity.longTermAdaptation) * Math.exp(-0.1 * (this.durationWeeks - 1));
+      const timeMult = commodity.longTermAdaptation + panicPremium;
 
       // Price increase = shortage * (1/|elasticity|) * time multiplier
       // Capped at reasonable bounds
@@ -187,7 +187,10 @@ class CascadeEngine {
         const sector = sectorMap[industry.name] || 'services';
         const sectorWeight = country.gdpSectors[sector] || 0.05;
         const ioMultiplier = (typeof INDUSTRIES !== 'undefined' && INDUSTRIES[industry.name] && INDUSTRIES[industry.name].ioMultiplier) ? INDUSTRIES[industry.name].ioMultiplier : 1.5;
-        const industryDrag = (industry.totalImpact / 100) * sectorWeight * ioMultiplier;
+        
+        // Scale GDP drag based on duration (a 52-week blockade hits full annual drag)
+        const durationScaling = Math.min((this.durationWeeks / 52) + 0.1, 1);
+        const industryDrag = (industry.totalImpact / 100) * sectorWeight * ioMultiplier * durationScaling;
         gdpDragPct += industryDrag;
 
         if (industryDrag > 0.001) { // 0.1% drag
@@ -252,8 +255,8 @@ class CascadeEngine {
 
     fertShortageIndex /= 100;
 
-    // Food CPI pass-through (0.3-0.7 range)
-    const passThroughCoeff = this.timeHorizon === 'short' ? 0.5 : 0.7;
+    // Food CPI pass-through (rises as duration increases, fertilizers take a season)
+    const passThroughCoeff = Math.min(0.4 + 0.4 * (this.durationWeeks / 52), 0.8);
     const foodPriceIncrease = fertShortageIndex * passThroughCoeff * 100;
 
     // Crop yield reduction estimate
