@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive platform monitoring the cascading effects of the Hormuz Strait blockade on global supply chains, industries, and economies.">
+  <title>Hormuz Strait Impact Tracker — Global Supply Chain Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <!-- ─── HEADER ─────────────────────────────────────────────────────────── -->
+  <header id="app-header">
+    <div class="header-left">
+      <div class="logo-mark">⚓</div>
+      <div class="header-text">
+        <h1>Hormuz Strait Impact Tracker</h1>
+        <p class="subtitle">Global Supply Chain Disruption Analysis</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="time-horizon-toggle" id="time-horizon-toggle">
+        <button class="toggle-btn active" data-horizon="short">Short-term</button>
+        <button class="toggle-btn" data-horizon="long">Long-term</button>
+      </div>
+      <button id="theme-toggle" class="theme-btn" title="Toggle Light/Dark Mode">🌓</button>
+      <div class="refresh-section">
+        <button id="refresh-btn" class="refresh-btn" title="Refresh data">
+          <span class="refresh-icon">⟳</span> Refresh
+        </button>
+        <span class="last-update" id="last-update">Last update: —</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── MAIN LAYOUT ────────────────────────────────────────────────────── -->
+  <div class="app-layout">
+
+    <!-- ─── SIDEBAR: Scenario Controls ─────────────────────────────── -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-section">
+        <h2 class="section-title">📊 Scenario</h2>
+        <div id="presets-container" class="presets-grid"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <h2 class="section-title">🎚️ Commodity Shortages</h2>
+        <p class="section-hint">Adjust disruption level for each commodity (%)</p>
+        <div id="sliders-container" class="sliders-container"></div>
+      </div>
+
+      <div class="sidebar-section food-impact-section">
+        <h2 class="section-title">🌾 Food Supply Impact</h2>
+        <div id="food-impact" class="food-impact-card"></div>
+      </div>
+    </aside>
+
+    <!-- ─── MAIN CONTENT ───────────────────────────────────────────── -->
+    <main id="main-content" class="main-content">
+
+      <!-- Commodity Cards Row -->
+      <section class="content-section">
+        <h2 class="section-title">📦 Commodity Impact Overview</h2>
+        <div id="commodity-cards" class="commodity-cards-grid"></div>
+      </section>
+
+      <!-- Sankey Diagram -->
+      <section class="content-section sankey-section">
+        <h2 class="section-title">🔀 Supply Chain Cascade Flow</h2>
+        <p class="section-desc">How commodity shortages cascade through industries to economic impacts</p>
+        <div id="sankey-container" class="sankey-container">
+          <div class="sankey-placeholder">Adjust shortage sliders to see the cascade flow</div>
+        </div>
+      </section>
+
+      <!-- Two-column: Map + Country Table -->
+      <section class="content-section split-section">
+        <div class="split-left">
+          <h2 class="section-title">🗺️ Global Impact Map</h2>
+          <div id="map-container" class="map-container"></div>
+        </div>
+        <div class="split-right">
+          <h2 class="section-title">🏆 Country Impact Ranking</h2>
+          <div id="country-table-container" class="country-table-container"></div>
+        </div>
+      </section>
+
+      <!-- Methodology & Sources -->
+      <section class="content-section methodology-section">
+        <details class="methodology-accordion">
+          <summary class="methodology-title">ℹ️ Methodology & Sources</summary>
+          <div class="methodology-content">
+            <p><strong>How Calculations are Made:</strong></p>
+            <ul>
+              <li><strong>Shortage Estimation:</strong> Driven by user inputs representing the percentage of global supply chain disrupted. This is factored against the specific commodity's historical dependency on the Strait of Hormuz.</li>
+              <li><strong>Price Impact:</strong> Calculated using Price Elasticity of Demand (PED) coefficients. When supply drops, inelastic commodities (like Oil or Helium) experience sharper price spikes than elastic ones. The model adjusts these based on substitution factors and chosen time horizons (Short-term shocks vs. Long-term adaptation).</li>
+              <li><strong>Economic Cascade (GDP Drag):</strong> Price shocks are mapped to 24 distinct global industries using pass-through coefficients. The engine evaluates the weight of these vulnerable industries within each country's specific GDP breakdown to calculate national economic drag.</li>
+              <li><strong>Food Supply Index:</strong> A specialized formula aggregates disruptions in agricultural precursors (Ammonia, Urea, Nitrogen, Sulfur) to estimate fertilizer shortages, which then pass through to projected crop yield reductions and food price inflation, combining with energy transportation costs.</li>
+            </ul>
+            <p><strong>Sources:</strong> Base commodity volumes, elasticities, and GDP sector weights are synthesized from publicly available research including the U.S. Energy Information Administration (EIA), World Bank Open Data, UN Comtrade Database, International Monetary Fund (IMF), International Fertilizer Association (IFA), and the U.S. Geological Survey (USGS).</p>
+            <p><em>Note: This platform acts as a heuristic decision-making aid designed to show dynamic cascade effects and relationships. Outcomes are estimates based on economic models, not exact predictive forecasts.</em></p>
+          </div>
+        </details>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ─── FOOTER ─────────────────────────────────────────────────────────── -->
+  <footer id="app-footer">
+    <p>Built by Shachar Lotan, Alenu.org</p>
+    <p class="footer-sources">Data refreshes every 12 hours | Built March 2026</p>
+  </footer>
+
+  <!-- ─── CDN SCRIPTS ────────────────────────────────────────────────────── -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- ─── INLINE APP SCRIPTS (avoids file:// CORS issues) ────────────── -->
+  <script>
+  // Wait for all CDN scripts to load, then load local scripts dynamically
+  function loadScript(src) {
+    return new Promise(function(resolve, reject) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = function() {
+        // If external load fails (file:// CORS), try inline fetch
+        console.warn('Script load failed for: ' + src + ', trying XHR...');
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', src, true);
+        xhr.onload = function() {
+          if (xhr.status === 200 || xhr.status === 0) {
+            try {
+              var script = document.createElement('script');
+              script.textContent = xhr.responseText;
+              document.head.appendChild(script);
+              resolve();
+            } catch(e) { reject(e); }
+          } else { reject(new Error('XHR failed: ' + xhr.status)); }
+        };
+        xhr.onerror = function() { reject(new Error('XHR failed for ' + src)); };
+        xhr.send();
+      };
+      document.head.appendChild(s);
+    });
+  }
+
+  // Chain load: data -> engine -> app
+  loadScript('src/data.js?v=4')
+    .then(function() { return loadScript('src/cascadeEngine.js?v=4'); })
+    .then(function() { return loadScript('src/app.js?v=4'); })
+    .then(function() { 
+      if (typeof window.initApp === 'function') {
+        window.initApp();
+      } else {
+        throw new Error('initApp is not defined');
+      }
+    })
+    .catch(function(err) {
+      console.error('Failed to load scripts:', err);
+      document.body.innerHTML += '<div style="color:red;padding:20px;font-family:monospace;">Script loading error: ' + err.message + '</div>';
+    });
+  </script>
+</body>
+</html>
