@@ -308,34 +308,38 @@ const COUNTRIES = {
 
 // Industry definitions with their relationships across commodities
 const INDUSTRIES = {
-  'Energy & Power': { color: '#F59E0B', icon: '⚡' },
-  'Transportation': { color: '#EF4444', icon: '🚛' },
-  'Petrochemicals': { color: '#EC4899', icon: '🏭' },
-  'Manufacturing': { color: '#8B5CF6', icon: '🔧' },
-  'Agriculture & Food': { color: '#22C55E', icon: '🌾' },
-  'Fertilizer Production': { color: '#16A34A', icon: '🧫' },
-  'Semiconductor Manufacturing': { color: '#6366F1', icon: '💾' },
-  'Healthcare (MRI)': { color: '#06B6D4', icon: '🏥' },
-  'Aerospace & Defense': { color: '#475569', icon: '✈️' },
-  'Construction': { color: '#78716C', icon: '🏗️' },
-  'Automotive': { color: '#DC2626', icon: '🚗' },
-  'Mining & Metal Extraction': { color: '#A16207', icon: '⛏️' },
-  'Chemical Processing': { color: '#7C3AED', icon: '⚗️' },
-  'Crop Production': { color: '#4ADE80', icon: '🌽' },
-  'Food Processing': { color: '#FB923C', icon: '🍞' },
-  'Packaging': { color: '#94A3B8', icon: '📦' },
-  'Industrial Heating': { color: '#F97316', icon: '🔥' },
-  'Chemicals': { color: '#A855F7', icon: '🧪' },
-  'Residential Heating': { color: '#FBBF24', icon: '🏠' },
-  'Fiber Optics & Telecom': { color: '#2563EB', icon: '📡' },
-  'Scientific Research': { color: '#0EA5E9', icon: '🔬' },
-  'Chemical Manufacturing': { color: '#D946EF', icon: '🏭' },
-  'Explosives & Mining': { color: '#B91C1C', icon: '💥' },
-  'Industrial Chemicals': { color: '#7C3AED', icon: '🧪' }
+  'Energy & Power': { color: '#F59E0B', icon: '⚡', ioMultiplier: 2.5 },
+  'Transportation': { color: '#EF4444', icon: '🚛', ioMultiplier: 1.8 },
+  'Petrochemicals': { color: '#EC4899', icon: '🏭', ioMultiplier: 2.0 },
+  'Manufacturing': { color: '#8B5CF6', icon: '🔧', ioMultiplier: 1.7 },
+  'Agriculture & Food': { color: '#22C55E', icon: '🌾', ioMultiplier: 1.5 },
+  'Fertilizer Production': { color: '#16A34A', icon: '🧫', ioMultiplier: 1.6 },
+  'Semiconductor Manufacturing': { color: '#6366F1', icon: '💾', ioMultiplier: 2.2 },
+  'Healthcare (MRI)': { color: '#06B6D4', icon: '🏥', ioMultiplier: 1.3 },
+  'Aerospace & Defense': { color: '#475569', icon: '✈️', ioMultiplier: 1.6 },
+  'Construction': { color: '#78716C', icon: '🏗️', ioMultiplier: 1.4 },
+  'Automotive': { color: '#DC2626', icon: '🚗', ioMultiplier: 1.5 },
+  'Mining & Metal Extraction': { color: '#A16207', icon: '⛏️', ioMultiplier: 1.4 },
+  'Chemical Processing': { color: '#7C3AED', icon: '⚗️', ioMultiplier: 1.8 },
+  'Crop Production': { color: '#4ADE80', icon: '🌽', ioMultiplier: 1.3 },
+  'Food Processing': { color: '#FB923C', icon: '🍞', ioMultiplier: 1.3 },
+  'Packaging': { color: '#94A3B8', icon: '📦', ioMultiplier: 1.2 },
+  'Industrial Heating': { color: '#F97316', icon: '🔥', ioMultiplier: 1.5 },
+  'Chemicals': { color: '#A855F7', icon: '🧪', ioMultiplier: 1.8 },
+  'Residential Heating': { color: '#FBBF24', icon: '🏠', ioMultiplier: 1.1 },
+  'Fiber Optics & Telecom': { color: '#2563EB', icon: '📡', ioMultiplier: 1.6 },
+  'Scientific Research': { color: '#0EA5E9', icon: '🔬', ioMultiplier: 1.2 },
+  'Chemical Manufacturing': { color: '#D946EF', icon: '🏭', ioMultiplier: 1.8 },
+  'Explosives & Mining': { color: '#B91C1C', icon: '💥', ioMultiplier: 1.4 },
+  'Industrial Chemicals': { color: '#7C3AED', icon: '🧪', ioMultiplier: 1.7 }
 };
 
 // Scenario presets
 const PRESETS = {
+  'Current Blockade': {
+    description: 'Current real-world disruption estimates (March 2026)',
+    shortages: { oil: 80, lng: 90, sulfur: 90, helium: 90, aluminum: 80, ammonia: 90, urea: 90, nitrogen: 90 }
+  },
   'Full Blockade': {
     description: 'Complete closure — no maritime traffic through Hormuz',
     shortages: { oil: 100, lng: 100, sulfur: 100, helium: 100, aluminum: 100, ammonia: 100, urea: 100, nitrogen: 100 }

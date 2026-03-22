@@ -15,16 +15,41 @@ let countrySortDir = 'desc';
 let autoRefreshInterval = null;
 
 window.initApp = function() {
-  renderPresets();
-  renderSliders();
-  initMap();
-  setupTimeHorizonToggle();
-  setupRefreshButton();
-  startAutoRefresh();
-
-  // Start with Partial Disruption to show something
-  applyPreset('Partial Disruption (50%)');
+  setupWelcomeScreen();
 };
+
+function setupWelcomeScreen() {
+  const btn = document.getElementById('welcome-enter-btn');
+  const input = document.getElementById('welcome-password');
+  const error = document.getElementById('welcome-error');
+
+  const checkPassword = () => {
+    if (input.value === 'alenu') {
+      document.getElementById('welcome-screen').classList.add('hidden');
+      document.getElementById('app-wrapper').style.display = 'flex';
+      
+      // Initialize main app
+      renderPresets();
+      renderSliders();
+      initMap();
+      setupTimeHorizonToggle();
+      setupRefreshButton();
+      startAutoRefresh();
+
+      // Start with Current Blockade
+      applyPreset('Current Blockade');
+    } else {
+      error.textContent = 'Incorrect password. Please try again.';
+      input.value = '';
+      input.focus();
+    }
+  };
+
+  btn.addEventListener('click', checkPassword);
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') checkPassword();
+  });
+}
 
 // ── PRESETS ──────────────────────────────────────────────────────────────────
 function renderPresets() {

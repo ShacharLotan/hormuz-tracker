@@ -186,7 +186,8 @@ class CascadeEngine {
 
         const sector = sectorMap[industry.name] || 'services';
         const sectorWeight = country.gdpSectors[sector] || 0.05;
-        const industryDrag = (industry.totalImpact / 100) * sectorWeight * 0.5;
+        const ioMultiplier = (typeof INDUSTRIES !== 'undefined' && INDUSTRIES[industry.name] && INDUSTRIES[industry.name].ioMultiplier) ? INDUSTRIES[industry.name].ioMultiplier : 1.5;
+        const industryDrag = (industry.totalImpact / 100) * sectorWeight * ioMultiplier;
         gdpDragPct += industryDrag;
 
         if (industryDrag > 0.001) { // 0.1% drag

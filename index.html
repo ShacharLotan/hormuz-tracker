@@ -12,8 +12,26 @@
   <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
-  <!-- ─── HEADER ─────────────────────────────────────────────────────────── -->
-  <header id="app-header">
+  <!-- ─── WELCOME SCREEN ─────────────────────────────────────────────────── -->
+  <div id="welcome-screen" class="welcome-screen">
+    <div class="welcome-content">
+      <img src="src/logo.png" alt="Alenu Logo" class="welcome-logo" onerror="this.style.display='none'">
+      <h1 class="welcome-title">עלינו - הנכדים המייסדים</h1>
+      <p class="welcome-subtitle">Hormuz Strait Impact Tracker</p>
+      <p class="welcome-disclaimer">Interactive platform monitoring the cascading effects of supply chain disruptions.<br><br>Built by Shachar Lotan, Alenu.org</p>
+      
+      <div class="password-group">
+        <input type="password" id="welcome-password" class="password-input" placeholder="Enter access password">
+        <button id="welcome-enter-btn" class="password-btn">Enter Platform</button>
+      </div>
+      <p id="welcome-error" class="welcome-error"></p>
+    </div>
+  </div>
+
+  <!-- Main App Content (Hidden until unlocked) -->
+  <div id="app-wrapper" style="display: none; height: 100vh; display: flex; flex-direction: column;">
+    <!-- ─── HEADER ─────────────────────────────────────────────────────────── -->
+    <header id="app-header">
     <div class="header-left">
       <div class="logo-mark">⚓</div>
       <div class="header-text">
@@ -97,7 +115,7 @@
             <ul>
               <li><strong>Shortage Estimation:</strong> Driven by user inputs representing the percentage of global supply chain disrupted. This is factored against the specific commodity's historical dependency on the Strait of Hormuz.</li>
               <li><strong>Price Impact:</strong> Calculated using Price Elasticity of Demand (PED) coefficients. When supply drops, inelastic commodities (like Oil or Helium) experience sharper price spikes than elastic ones. The model adjusts these based on substitution factors and chosen time horizons (Short-term shocks vs. Long-term adaptation).</li>
-              <li><strong>Economic Cascade (GDP Drag):</strong> Price shocks are mapped to 24 distinct global industries using pass-through coefficients. The engine evaluates the weight of these vulnerable industries within each country's specific GDP breakdown to calculate national economic drag.</li>
+              <li><strong>Economic Cascade (GDP Drag):</strong> Price shocks are mapped to 24 distinct global industries using pass-through coefficients. <strong>Crucially, we employ an Input-Output (I/O) multiplier</strong> to account for how a shock to a foundational sector (like Energy or Manufacturing) cascades downstream, amplifying the total economic drag before evaluating it against each country's specific GDP breakdown.</li>
               <li><strong>Food Supply Index:</strong> A specialized formula aggregates disruptions in agricultural precursors (Ammonia, Urea, Nitrogen, Sulfur) to estimate fertilizer shortages, which then pass through to projected crop yield reductions and food price inflation, combining with energy transportation costs.</li>
             </ul>
             <p><strong>Sources:</strong> Base commodity volumes, elasticities, and GDP sector weights are synthesized from publicly available research including the U.S. Energy Information Administration (EIA), World Bank Open Data, UN Comtrade Database, International Monetary Fund (IMF), International Fertilizer Association (IFA), and the U.S. Geological Survey (USGS).</p>
@@ -112,8 +130,9 @@
   <!-- ─── FOOTER ─────────────────────────────────────────────────────────── -->
   <footer id="app-footer">
     <p>Built by Shachar Lotan, Alenu.org</p>
-    <p class="footer-sources">Data refreshes every 12 hours | Built March 2026</p>
+    <p class="footer-sources">Data refreshes every 12 hours</p>
   </footer>
+  </div> <!-- End app-wrapper -->
 
   <!-- ─── CDN SCRIPTS ────────────────────────────────────────────────────── -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
