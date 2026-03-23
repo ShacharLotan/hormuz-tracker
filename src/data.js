@@ -17,7 +17,7 @@ const COMMODITIES = {
     shortTermMultiplier: 2.5,
     longTermAdaptation: 0.55,
     unit: '$/barrel',
-    basePrice: 78,
+    basePrice: 80,
     description: '~21% of global petroleum passes through Hormuz. Strategic reserves and alternative production can partially offset, but inelastic demand means prices spike fast.',
     keyExporters: ['Saudi Arabia', 'Iraq', 'UAE', 'Kuwait', 'Iran', 'Qatar'],
     industries: {
@@ -337,8 +337,8 @@ const INDUSTRIES = {
 // Scenario presets
 const PRESETS = {
   'Current Blockade': {
-    description: 'Current real-world disruption estimates (March 2026)',
-    shortages: { oil: 80, lng: 90, sulfur: 90, helium: 90, aluminum: 80, ammonia: 90, urea: 90, nitrogen: 90 }
+    description: 'Current real-world disruption estimates (March 2026, Week 4)',
+    shortages: { oil: 20, lng: 25, sulfur: 35, helium: 35, aluminum: 25, ammonia: 30, urea: 35, nitrogen: 30 }
   },
   'Full Blockade': {
     description: 'Complete closure — no maritime traffic through Hormuz',

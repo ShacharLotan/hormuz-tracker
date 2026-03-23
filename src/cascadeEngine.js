@@ -5,7 +5,7 @@
 
 class CascadeEngine {
   constructor() {
-    this.durationWeeks = 26;
+    this.durationWeeks = 4;
     this.shortages = {};
     Object.keys(COMMODITIES).forEach(k => this.shortages[k] = 0);
     this.results = null;
