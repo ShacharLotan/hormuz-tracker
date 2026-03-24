@@ -133,7 +133,30 @@
           <div id="map-container" class="map-container"></div>
         </div>
       </section>
-
+ 
+      <!-- ─── KEY CONCEPTS GLOSSARY ───────────────────────────────────────── -->
+      <section class="content-section glossary-section">
+        <h2 class="section-title">🗝️ Key Economic Concepts</h2>
+        <div class="glossary-grid">
+          <div class="glossary-item">
+            <span class="glossary-term">GDP Drag</span>
+            <p class="glossary-def">The reduction in total economic output (GDP) caused by supply chain friction and energy costs. It represents the "brake" applied to national growth.</p>
+          </div>
+          <div class="glossary-item">
+            <span class="glossary-term">I/O Multiplier</span>
+            <p class="glossary-def">The Input-Output multiplier tracks how a shock to one industry (e.g., Oil) ripples through others that depend on it (e.g., Plastics, Logistics).</p>
+          </div>
+          <div class="glossary-item">
+            <span class="glossary-term">Price Elasticity</span>
+            <p class="glossary-def">A measure of how sensitive demand is to price changes. Commodities like LNG are "inelastic," meaning prices spike sharply when supply drops slightly.</p>
+          </div>
+          <div class="glossary-item">
+            <span class="glossary-term">Supply Cascade</span>
+            <p class="glossary-def">The domino effect where a primary shortage (Raw Sulfur) leads to secondary shortages (Fertilizers) and finally tertiary impacts (Crop Yields).</p>
+          </div>
+        </div>
+      </section>
+ 
       <!-- Methodology & Sources -->
       <section class="content-section methodology-section">
         <details class="methodology-accordion">
@@ -142,8 +165,8 @@
             <p><strong>How Calculations are Made:</strong></p>
             <ul>
               <li><strong>Shortage Estimation:</strong> Driven by user inputs representing the percentage of global supply chain disrupted. This is factored against the specific commodity's historical dependency on the Strait of Hormuz.</li>
-              <li><strong>Price Impact:</strong> Calculated using Price Elasticity of Demand (PED) coefficients. When supply drops, inelastic commodities (like Oil or Helium) experience sharper price spikes than elastic ones. The model adjusts these based on substitution factors and chosen time horizons (Short-term shocks vs. Long-term adaptation).</li>
-              <li><strong>Economic Cascade (GDP Drag):</strong> Price shocks are mapped to 24 distinct global industries using pass-through coefficients. <strong>Crucially, we employ an Input-Output (I/O) multiplier</strong> to account for how a shock to a foundational sector (like Energy or Manufacturing) cascades downstream, amplifying the total economic drag before evaluating it against each country's specific GDP breakdown.</li>
+              <li><strong>Price Impact:</strong> Calculated using <span class="term-highlight" title="Sensitivity of demand to price changes">Price Elasticity</span> of Demand (PED) coefficients. When supply drops, inelastic commodities (like Oil or Helium) experience sharper price spikes than elastic ones. The model adjusts these based on substitution factors and chosen time horizons (Short-term shocks vs. Long-term adaptation).</li>
+              <li><strong>Economic Cascade (<span class="term-highlight" title="The reduction in total economic output">GDP Drag</span>):</strong> Price shocks are mapped to 24 distinct global industries using pass-through coefficients. <strong>Crucially, we employ an <span class="term-highlight" title="Tracks how shocks ripple through dependent sectors">Input-Output (I/O) multiplier</span></strong> to account for how a shock to a foundational sector (like Energy or Manufacturing) cascades downstream, amplifying the total economic drag before evaluating it against each country's specific GDP breakdown.</li>
               <li><strong>Food Supply Index:</strong> A specialized formula aggregates disruptions in agricultural precursors (Ammonia, Urea, Nitrogen, Sulfur) to estimate fertilizer shortages, which then pass through to projected crop yield reductions and food price inflation, combining with energy transportation costs.</li>
             </ul>
             <p><strong>Sources:</strong> Base commodity volumes, elasticities, and GDP sector weights are synthesized from publicly available research including the U.S. Energy Information Administration (EIA), World Bank Open Data, UN Comtrade Database, International Monetary Fund (IMF), International Fertilizer Association (IFA), and the U.S. Geological Survey (USGS).</p>

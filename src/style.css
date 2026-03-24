@@ -800,6 +800,56 @@ body {
   opacity: 0.7;
 }
 
+/* ─── GLOSSARY SECTION ─────────────────────────────────────────────────── */
+.glossary-section {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-xl);
+}
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-md);
+}
+
+.glossary-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  transition: all 0.3s ease;
+}
+
+.glossary-item:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+  background: var(--bg-card-hover);
+}
+
+.glossary-term {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #3B82F6;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.glossary-def {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Tooltip-like highlight for terms throughout the text */
+.term-highlight {
+  color: #3B82F6;
+  font-weight: 600;
+  border-bottom: 1px dashed rgba(59, 130, 246, 0.4);
+  cursor: help;
+}
+
 /* Sankey labels */
 .sankey-label-group {
   display: flex;
