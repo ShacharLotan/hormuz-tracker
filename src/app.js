@@ -193,7 +193,6 @@ function recompute() {
   renderFoodImpact(results.food);
   updateMap(results.countries);
   renderKPIs(results.kpis);
-  renderHeatmap(results.heatmap);
   renderSensitivity(results.sensitivity);
 }
 
@@ -712,69 +711,6 @@ function renderKPIs(kpis) {
       <span class="kpi-value" style="color: ${foodColor}; text-transform: capitalize;">${kpis.foodSeverity}</span>
     </div>
   `;
-}
-
-function renderHeatmap(heatmapData) {
-  const container = document.getElementById('heatmap-container');
-  if (!container) return;
-  
-  if (!heatmapData.matrix || heatmapData.matrix.length === 0) {
-    container.innerHTML = '<div class="heatmap-placeholder">Adjust shortages to generate contagion heatmap</div>';
-    return;
-  }
-  
-  // Create grid
-  // Col 0: labels, Cols 1..N: commodities
-  const numCols = heatmapData.cols.length + 1;
-  container.style.display = 'grid';
-  container.style.gridTemplateColumns = `120px repeat(${heatmapData.cols.length}, 1fr)`;
-  container.innerHTML = '';
-  
-  // Header row
-  container.appendChild(document.createElement('div')); // empty top-left
-  for (const col of heatmapData.cols) {
-    const el = document.createElement('div');
-    el.className = 'heatmap-col-label';
-    el.textContent = col.name;
-    container.appendChild(el);
-  }
-  
-  // Data rows
-  for (const row of heatmapData.matrix) {
-    const rowLabel = document.createElement('div');
-    rowLabel.className = 'heatmap-axis-label';
-    rowLabel.textContent = row.industry;
-    container.appendChild(rowLabel);
-    
-    for (const cell of row.cells) {
-      const cellEl = document.createElement('div');
-      cellEl.className = 'heatmap-cell';
-      
-      const val = cell.value;
-      let opacity = 0.05;
-      if (val > 0.1) opacity = Math.min(0.9, 0.1 + (val / 10)); // normalize roughly 0-10
-      
-      const r = parseInt(cell.color.substring(1,3), 16);
-      const g = parseInt(cell.color.substring(3,5), 16);
-      const b = parseInt(cell.color.substring(5,7), 16);
-      
-      cellEl.style.background = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-      cellEl.title = `${row.industry} exposure to ${cell.commodity}: ${val.toFixed(2)}%`;
-      
-      // Cluster Selection filtering
-      cellEl.addEventListener('click', () => {
-        const searchInput = document.getElementById('country-search');
-        if (searchInput) searchInput.value = ''; // future extension
-        countrySortField = 'overallScore';
-        countrySortDir = 'desc';
-        // highlight logic could go here by altering the map or country table explicitly 
-        // to only show countries dependent on this industry.
-        // For now, we will just alert or re-render visually if we want.
-      });
-      
-      container.appendChild(cellEl);
-    }
-  }
 }
 
 function setupSensitivity() {

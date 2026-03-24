@@ -117,11 +117,13 @@ class CascadeEngine {
       const panicPremium = Math.max(0, (commodity.shortTermMultiplier - commodity.longTermAdaptation + panicOffset)) * Math.exp(-0.1 * (this.durationWeeks - 1));
       const timeMult = commodity.longTermAdaptation + panicPremium;
 
-      // Price increase = shortage * (1/|elasticity|) * time multiplier
-      // Capped at reasonable bounds
+      // As shortages get extreme, substitution scaling becomes aggressively non-linear, softening the price curve
       const elasticity = Math.abs(commodity.priceElasticityMid);
-      const rawPriceIncrease = effectiveShortage * (1 / elasticity) * timeMult;
-      const priceIncreasePct = Math.min(rawPriceIncrease, 10); // cap at 1000%
+      const substitutionDampener = 1.0 + (effectiveShortage * 2.0); 
+      const rawPriceIncrease = (effectiveShortage * (1 / elasticity) * timeMult) / substitutionDampener;
+      
+      // Conservative cap: historically even extreme shocks rarely sustain >250% average baseline increase
+      const priceIncreasePct = Math.min(rawPriceIncrease, 2.5);
 
       const estimatedPrice = commodity.basePrice * (1 + priceIncreasePct);
 
@@ -240,9 +242,12 @@ class CascadeEngine {
         const sectorWeight = country.gdpSectors[sector] || 0.05;
         const ioMultiplier = (typeof INDUSTRIES !== 'undefined' && INDUSTRIES[industry.name] && INDUSTRIES[industry.name].ioMultiplier) ? INDUSTRIES[industry.name].ioMultiplier : 1.5;
         
+        // Global macroeconomic resilience (central bank shifts, strategic rationing) dampens the raw linear drag
+        const macroResilienceDampener = 0.15; // Reduces the raw linear math to a realistic 1-4% global GDP shock 
+
         // Scale GDP drag based on duration (a 52-week blockade hits full annual drag)
         const durationScaling = Math.min((this.durationWeeks / 52) + 0.1, 1);
-        const industryDrag = (industry.totalImpact / 100) * sectorWeight * ioMultiplier * durationScaling;
+        const industryDrag = (industry.totalImpact / 100) * sectorWeight * ioMultiplier * durationScaling * macroResilienceDampener;
         gdpDragPct += industryDrag;
 
         if (industryDrag > 0.001) { // 0.1% drag
