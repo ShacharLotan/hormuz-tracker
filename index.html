@@ -44,13 +44,6 @@
       </div>
     </div>
     <div class="header-right">
-      <div class="duration-control">
-        <div class="duration-header">
-          <span class="duration-label">Blockade Duration ⏱️</span>
-          <span class="duration-value"><span id="duration-display">4</span> weeks</span>
-        </div>
-        <input type="range" id="duration-slider" min="1" max="52" value="4" class="duration-track">
-      </div>
       <button id="theme-toggle" class="theme-btn" title="Toggle Light/Dark Mode">🌓</button>
       <div class="refresh-section">
         <button id="refresh-btn" class="refresh-btn" title="Refresh data">
@@ -67,13 +60,34 @@
     <!-- ─── SIDEBAR: Scenario Controls ─────────────────────────────── -->
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-section">
-        <h2 class="section-title">📊 Scenario</h2>
+        <h2 class="section-title">📊 Scenario & Timeline</h2>
+        <div class="duration-control sidebar-duration">
+          <div class="duration-header">
+            <span class="duration-label">Blockade Duration ⏱️</span>
+            <span class="duration-value"><span id="duration-display">4</span> weeks</span>
+          </div>
+          <div class="playback-controls">
+            <button id="play-btn" class="play-btn" title="Play temporal simulation">▶️</button>
+            <input type="range" id="duration-slider" min="1" max="52" value="4" class="duration-track duration-track-sidebar">
+          </div>
+        </div>
         <div id="presets-container" class="presets-grid"></div>
       </div>
 
       <div class="sidebar-section">
+        <h2 class="section-title">🛡️ Mitigation Strategies</h2>
+        <p class="section-hint">Toggle what-if alternative pathways</p>
+        <div id="mitigations-container" class="mitigations-container"></div>
+      </div>
+
+      <div class="sidebar-section">
         <h2 class="section-title">🎚️ Commodity Shortages</h2>
-        <p class="section-hint">Adjust disruption level for each commodity (%)</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; margin-top:-8px;">
+          <p class="section-hint" style="margin:0;">Adjust disruption level (%)</p>
+          <label style="font-size:0.65rem; color:#F59E0B; display:flex; align-items:center; gap:4px; font-weight:600; cursor:pointer;" title="Show ripple effect of +10% shortage">
+            <input type="checkbox" id="sensitivity-toggle" style="accent-color:#F59E0B;" /> 🦋 Sensitivity Mode
+          </label>
+        </div>
         <div id="sliders-container" class="sliders-container"></div>
       </div>
 
@@ -85,6 +99,13 @@
 
     <!-- ─── MAIN CONTENT ───────────────────────────────────────────── -->
     <main id="main-content" class="main-content">
+
+      <!-- KPI Scorecard Row -->
+      <section class="content-section kpi-section">
+        <div id="kpi-scorecard" class="kpi-scorecard-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
 
       <!-- Commodity Cards Row -->
       <section class="content-section">
@@ -98,6 +119,19 @@
         <p class="section-desc">How commodity shortages cascade through industries to economic impacts</p>
         <div id="sankey-container" class="sankey-container">
           <div class="sankey-placeholder">Adjust shortage sliders to see the cascade flow</div>
+        </div>
+      </section>
+
+      <!-- Risk Clustering Heatmap -->
+      <section class="content-section heatmap-section">
+        <div class="section-header-row">
+          <h2 class="section-title">🔥 Contagion Heatmap</h2>
+          <span class="section-hint">Commodity x Industry matrix. Click a cell to filter Rankings.</span>
+        </div>
+        <div class="heatmap-wrapper">
+          <div id="heatmap-container" class="heatmap-container">
+            <div class="heatmap-placeholder">Adjust shortages to generate heatmap</div>
+          </div>
         </div>
       </section>
 

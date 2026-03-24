@@ -418,6 +418,176 @@ body {
   transform: scale(1.2);
 }
 
+/* ─── NEW FEATURES (Mitigations, Playback, KPI Scorecard, Heatmap) ────── */
+.sidebar-duration { margin-bottom: 24px; padding: 12px; }
+.duration-track-sidebar { margin-top: 8px; }
+
+.playback-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.play-btn {
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-medium);
+  border-radius: 4px;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.play-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+}
+.play-btn.playing {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #EF4444;
+  color: #FCA5A5;
+}
+
+.kpi-scorecard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+.kpi-card {
+  background: linear-gradient(145deg, var(--bg-card), var(--bg-card-hover));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0; width: 4px;
+  background: var(--kpi-color, #3b82f6);
+}
+.kpi-title {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+.kpi-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: 'Inter', monospace;
+}
+
+.mitigations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mitigation-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mitigation-toggle:hover {
+  border-color: var(--border-medium);
+}
+.mitigation-toggle.active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+}
+.mitiq-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex: 1;
+}
+.mitigation-toggle.active .mitiq-label {
+  color: var(--text-primary);
+}
+.mitiq-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.heatmap-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  overflow-x: auto;
+}
+.heatmap-container {
+  min-width: 600px;
+}
+.heatmap-grid {
+  display: grid;
+  gap: 2px;
+}
+.heatmap-cell {
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.heatmap-cell:hover {
+  transform: scale(1.15);
+  z-index: 10;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  outline: 1px solid white;
+}
+.heatmap-axis-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: right;
+  padding-right: 8px;
+  align-self: center;
+  font-weight: 600;
+}
+.heatmap-col-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding-top: 8px;
+  justify-self: center;
+  font-weight: 600;
+}
+.section-header-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: var(--space-md);
+}
+.section-header-row .section-title {
+  margin-bottom: 0;
+}
+.heatmap-placeholder {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 40px;
+}
+
 .slider-track::-moz-range-thumb {
   width: 16px;
   height: 16px;
@@ -1202,6 +1372,7 @@ details[open] .methodology-title:after {
   width: 100%;
   height: 4px;
   -webkit-appearance: none;
+  appearance: none;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
   outline: none;
@@ -1210,6 +1381,7 @@ details[open] .methodology-title:after {
 }
 .duration-track::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
   width: 14px;
   height: 14px;
   border-radius: 50%;

@@ -31,8 +31,11 @@ function setupWelcomeScreen() {
       // Initialize main app
       renderPresets();
       renderSliders();
+      renderMitigations();
       initMap();
       setupDurationSlider();
+      setupPlayback();
+      setupSensitivity();
       setupRefreshButton();
       startAutoRefresh();
 
@@ -111,7 +114,7 @@ function renderSliders() {
       </div>
       <input type="range" id="slider-${key}" class="slider-track" min="0" max="100" value="0"
         style="background: linear-gradient(to right, ${commodity.color}33 0%, ${commodity.color}33 0%, rgba(255,255,255,0.05) 0%)" />
-      <div class="slider-meta">
+      <div class="slider-meta" id="meta-${key}">
         <span>Hormuz dep: ${Math.round(commodity.hormuzDependencyPct * 100)}%</span>
         <span>Elasticity: ${commodity.priceElasticityMid}</span>
       </div>
@@ -182,12 +185,16 @@ function onSliderChange() {
 
 // ── RECOMPUTE & RENDER ALL ──────────────────────────────────────────────────
 function recompute() {
-  const results = engine.compute();
+  const isSensitivity = document.getElementById('sensitivity-toggle')?.checked;
+  const results = isSensitivity ? engine.computeSensitivity() : engine.compute();
   renderCommodityCards(results.commodities);
   renderSankey(results.sankey);
   renderCountryTable(results.countries);
   renderFoodImpact(results.food);
   updateMap(results.countries);
+  renderKPIs(results.kpis);
+  renderHeatmap(results.heatmap);
+  renderSensitivity(results.sensitivity);
 }
 
 // ── COMMODITY CARDS ─────────────────────────────────────────────────────────
@@ -614,3 +621,186 @@ function startAutoRefresh() {
     refreshData();
   }, 12 * 60 * 60 * 1000);
 }
+
+// ── NEW FEATURES (Mitigations, DVR Playback, KPIs, Heatmap) ──────────────────
+
+function renderMitigations() {
+  const container = document.getElementById('mitigations-container');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  for (const [key, mitiq] of Object.entries(MITIGATIONS)) {
+    const el = document.createElement('div');
+    el.className = 'mitigation-toggle';
+    el.title = mitiq.desc;
+    el.innerHTML = `
+      <span class="mitiq-label">${mitiq.name}</span>
+      <input class="mitiq-checkbox" type="checkbox" id="mitiq-${key}" />
+    `;
+    
+    el.addEventListener('click', (e) => {
+      // prevent double triggering if clicking directly on checkbox
+      if (e.target.tagName !== 'INPUT') {
+        const cb = document.getElementById(`mitiq-${key}`);
+        cb.checked = !cb.checked;
+      }
+      const isChecked = document.getElementById(`mitiq-${key}`).checked;
+      el.classList.toggle('active', isChecked);
+      engine.toggleMitigation(key, isChecked);
+      recompute();
+    });
+    
+    container.appendChild(el);
+  }
+}
+
+let playbackInterval = null;
+function setupPlayback() {
+  const btn = document.getElementById('play-btn');
+  const slider = document.getElementById('duration-slider');
+  const display = document.getElementById('duration-display');
+  if (!btn || !slider) return;
+
+  btn.addEventListener('click', () => {
+    if (playbackInterval) {
+      clearInterval(playbackInterval);
+      playbackInterval = null;
+      btn.innerHTML = '▶️';
+      btn.classList.remove('playing');
+    } else {
+      btn.innerHTML = '⏸️';
+      btn.classList.add('playing');
+      playbackInterval = setInterval(() => {
+        let val = parseInt(slider.value);
+        if (val >= 52) {
+          clearInterval(playbackInterval);
+          playbackInterval = null;
+          btn.innerHTML = '▶️';
+          btn.classList.remove('playing');
+        } else {
+          val += 1;
+          slider.value = val;
+          display.textContent = val;
+          engine.setDurationWeeks(val);
+          recompute();
+        }
+      }, 600);
+    }
+  });
+}
+
+function renderKPIs(kpis) {
+  const container = document.getElementById('kpi-scorecard');
+  if (!container) return;
+  
+  const gdpColor = kpis.globalDragPct > 0.05 ? '#EF4444' : kpis.globalDragPct > 0.02 ? '#F59E0B' : '#4ADE80';
+  const priceColor = kpis.maxShockPct > 200 ? '#EF4444' : kpis.maxShockPct > 50 ? '#F59E0B' : '#4ADE80';
+  const sevColorMap = { 'critical': '#EF4444', 'severe': '#F97316', 'high': '#F59E0B', 'moderate': '#22C55E', 'low': '#4ADE80' };
+  const foodColor = sevColorMap[kpis.foodSeverity] || '#94A3B8';
+  
+  container.innerHTML = `
+    <div class="kpi-card" style="--kpi-color: ${gdpColor}">
+      <span class="kpi-title">Global GDP Drag (Top 10)</span>
+      <span class="kpi-value" style="color: ${gdpColor}">-${(kpis.globalDragPct * 100).toFixed(2)}%</span>
+    </div>
+    <div class="kpi-card" style="--kpi-color: ${priceColor}">
+      <span class="kpi-title">Max Price Shock (${kpis.maxShockName})</span>
+      <span class="kpi-value" style="color: ${priceColor}">+${kpis.maxShockPct.toFixed(0)}%</span>
+    </div>
+    <div class="kpi-card" style="--kpi-color: ${foodColor}">
+      <span class="kpi-title">Food System Severity</span>
+      <span class="kpi-value" style="color: ${foodColor}; text-transform: capitalize;">${kpis.foodSeverity}</span>
+    </div>
+  `;
+}
+
+function renderHeatmap(heatmapData) {
+  const container = document.getElementById('heatmap-container');
+  if (!container) return;
+  
+  if (!heatmapData.matrix || heatmapData.matrix.length === 0) {
+    container.innerHTML = '<div class="heatmap-placeholder">Adjust shortages to generate contagion heatmap</div>';
+    return;
+  }
+  
+  // Create grid
+  // Col 0: labels, Cols 1..N: commodities
+  const numCols = heatmapData.cols.length + 1;
+  container.style.display = 'grid';
+  container.style.gridTemplateColumns = `120px repeat(${heatmapData.cols.length}, 1fr)`;
+  container.innerHTML = '';
+  
+  // Header row
+  container.appendChild(document.createElement('div')); // empty top-left
+  for (const col of heatmapData.cols) {
+    const el = document.createElement('div');
+    el.className = 'heatmap-col-label';
+    el.textContent = col.name;
+    container.appendChild(el);
+  }
+  
+  // Data rows
+  for (const row of heatmapData.matrix) {
+    const rowLabel = document.createElement('div');
+    rowLabel.className = 'heatmap-axis-label';
+    rowLabel.textContent = row.industry;
+    container.appendChild(rowLabel);
+    
+    for (const cell of row.cells) {
+      const cellEl = document.createElement('div');
+      cellEl.className = 'heatmap-cell';
+      
+      const val = cell.value;
+      let opacity = 0.05;
+      if (val > 0.1) opacity = Math.min(0.9, 0.1 + (val / 10)); // normalize roughly 0-10
+      
+      const r = parseInt(cell.color.substring(1,3), 16);
+      const g = parseInt(cell.color.substring(3,5), 16);
+      const b = parseInt(cell.color.substring(5,7), 16);
+      
+      cellEl.style.background = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      cellEl.title = `${row.industry} exposure to ${cell.commodity}: ${val.toFixed(2)}%`;
+      
+      // Cluster Selection filtering
+      cellEl.addEventListener('click', () => {
+        const searchInput = document.getElementById('country-search');
+        if (searchInput) searchInput.value = ''; // future extension
+        countrySortField = 'overallScore';
+        countrySortDir = 'desc';
+        // highlight logic could go here by altering the map or country table explicitly 
+        // to only show countries dependent on this industry.
+        // For now, we will just alert or re-render visually if we want.
+      });
+      
+      container.appendChild(cellEl);
+    }
+  }
+}
+
+function setupSensitivity() {
+  const toggle = document.getElementById('sensitivity-toggle');
+  if (toggle) toggle.addEventListener('change', recompute);
+}
+
+function renderSensitivity(sensitivity) {
+  for (const key of Object.keys(COMMODITIES)) {
+    const metaDiv = document.getElementById(`meta-${key}`);
+    if (!metaDiv) continue;
+    
+    if (sensitivity && sensitivity[key]) {
+      const s = sensitivity[key];
+      metaDiv.innerHTML = `
+        <span style="color:#F59E0B; font-weight:600;">🦋 +10% Drop ➡</span>
+        <span style="color:#E2E8F0;">GDP Drag <b style="color:#EF4444;">+${s.gdpDelta.toFixed(2)}%</b>, Food <b style="color:#EF4444;">+${s.foodDelta.toFixed(1)}%</b></span>
+      `;
+    } else {
+      const commodity = COMMODITIES[key];
+      metaDiv.innerHTML = `
+        <span>Hormuz dep: ${Math.round(commodity.hormuzDependencyPct * 100)}%</span>
+        <span>Elasticity: ${commodity.priceElasticityMid}</span>
+      `;
+    }
+  }
+}
+
+

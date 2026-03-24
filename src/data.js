@@ -334,11 +334,30 @@ const INDUSTRIES = {
   'Industrial Chemicals': { color: '#7C3AED', icon: '🧪', ioMultiplier: 1.7 }
 };
 
+// Mitigation strategies that alter underlying impact calculations
+const MITIGATIONS = {
+  lng_reroute: { id: 'lng_reroute', name: 'Reroute 30% LNG', desc: 'Secure 30% of disrupted LNG via alternate routes' },
+  spr_release: { id: 'spr_release', name: 'Global SPR Release', desc: 'Offsets up to 10% of oil shortage and cuts panic' },
+  agri_priority: { id: 'agri_priority', name: 'Fertilizer Rail Priority', desc: 'Shields food supply by expediting ammonia/urea' }
+};
+
 // Scenario presets
 const PRESETS = {
   'Current Blockade': {
     description: 'Current real-world disruption estimates (March 2026, Week 4)',
     shortages: { oil: 20, lng: 25, sulfur: 35, helium: 35, aluminum: 25, ammonia: 30, urea: 35, nitrogen: 30 }
+  },
+  'The Suez Alternative': {
+    description: 'Rerouting strains Suez but averts full closure (Moderate disruption)',
+    shortages: { oil: 30, lng: 40, sulfur: 50, helium: 50, aluminum: 40, ammonia: 50, urea: 50, nitrogen: 50 }
+  },
+  'Winter Energy Peak': {
+    description: 'Hit coincides with Dec/Jan peak demand (Energy severe)',
+    shortages: { oil: 60, lng: 90, sulfur: 40, helium: 40, aluminum: 30, ammonia: 40, urea: 40, nitrogen: 40 }
+  },
+  'Agricultural Collapse': {
+    description: 'Critical failure in Gulf fertilizer exports hitting global harvests',
+    shortages: { oil: 20, lng: 30, sulfur: 90, helium: 30, aluminum: 20, ammonia: 100, urea: 100, nitrogen: 100 }
   },
   'Full Blockade': {
     description: 'Complete closure — no maritime traffic through Hormuz',

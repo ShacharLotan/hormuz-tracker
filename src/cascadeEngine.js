@@ -8,6 +8,13 @@ class CascadeEngine {
     this.durationWeeks = 4;
     this.shortages = {};
     Object.keys(COMMODITIES).forEach(k => this.shortages[k] = 0);
+    this.activeMitigations = new Set();
+    this.results = null;
+  }
+
+  toggleMitigation(id, state) {
+    if (state) this.activeMitigations.add(id);
+    else this.activeMitigations.delete(id);
     this.results = null;
   }
 
@@ -28,6 +35,8 @@ class CascadeEngine {
     const countryImpacts = this._computeCountryImpacts(commodityImpacts, industryImpacts);
     const foodImpact = this._computeFoodImpact(commodityImpacts);
     const sankeyData = this._buildSankeyData(commodityImpacts, industryImpacts);
+    const heatmapData = this._buildHeatmapData(commodityImpacts, industryImpacts);
+    const kpis = this._computeKPIs(commodityImpacts, countryImpacts, foodImpact);
 
     this.results = {
       commodities: commodityImpacts,
@@ -35,9 +44,38 @@ class CascadeEngine {
       countries: countryImpacts,
       food: foodImpact,
       sankey: sankeyData,
+      heatmap: heatmapData,
+      kpis: kpis,
       timestamp: new Date().toISOString()
     };
 
+    return this.results;
+  }
+
+  // ── Sensitivity Analysis ────────────────────────────────────────────────────
+  computeSensitivity() {
+    const baseResults = this.compute();
+    const sensitivity = {};
+    const originalShortages = { ...this.shortages };
+
+    for (const key of Object.keys(COMMODITIES)) {
+      if (this.shortages[key] >= 100) { sensitivity[key] = null; continue; }
+      
+      this.shortages[key] = Math.min(100, this.shortages[key] + 10);
+      const testResults = this.compute();
+      
+      sensitivity[key] = {
+        gdpDelta: (testResults.kpis.globalDragPct - baseResults.kpis.globalDragPct) * 100,
+        priceDelta: testResults.commodities[key].priceIncreasePct - baseResults.commodities[key].priceIncreasePct,
+        foodDelta: testResults.food.foodPriceIncreasePct - baseResults.food.foodPriceIncreasePct
+      };
+      
+      this.shortages[key] = originalShortages[key];
+    }
+    
+    // restore base compute state
+    this.compute();
+    this.results.sensitivity = sensitivity;
     return this.results;
   }
 
@@ -63,11 +101,20 @@ class CascadeEngine {
       }
 
       // Effective shortage after Hormuz dependency and substitution
-      const effectiveShortage = shortagePct * commodity.hormuzDependencyPct * (1 - commodity.substitutionFactor);
+      let effectiveShortage = shortagePct * commodity.hormuzDependencyPct * (1 - commodity.substitutionFactor);
+
+      let panicOffset = 0;
+      if (this.activeMitigations.has('lng_reroute') && key === 'lng') {
+        effectiveShortage *= 0.70; // 30% reduction from alternate routes
+      }
+      if (this.activeMitigations.has('spr_release') && key === 'oil') {
+        effectiveShortage = Math.max(0, effectiveShortage - 0.05); // Direct 5% offset
+        panicOffset = -0.6; // SPR cuts panic premium
+      }
 
       // Time-adjusted multiplier: exponential decay of shock premium based on duration weeks
       // Week 1-4 = high panic (near shortTerm), Week 52 = fully adapted (near longTerm)
-      const panicPremium = (commodity.shortTermMultiplier - commodity.longTermAdaptation) * Math.exp(-0.1 * (this.durationWeeks - 1));
+      const panicPremium = Math.max(0, (commodity.shortTermMultiplier - commodity.longTermAdaptation + panicOffset)) * Math.exp(-0.1 * (this.durationWeeks - 1));
       const timeMult = commodity.longTermAdaptation + panicPremium;
 
       // Price increase = shortage * (1/|elasticity|) * time multiplier
@@ -127,7 +174,12 @@ class CascadeEngine {
           };
         }
 
-        const impactContribution = (commImpact.effectiveShortage / 100) * industryData.passThroughCoeff;
+        let ptCoeff = industryData.passThroughCoeff;
+        if (this.activeMitigations.has('agri_priority') && (industryName === 'Fertilizer Production' || industryName === 'Agriculture & Food')) {
+          ptCoeff *= 0.6; // Priority rail logistics shields 40% of standard pass-through
+        }
+
+        const impactContribution = (commImpact.effectiveShortage / 100) * ptCoeff;
         industryMap[industryName].totalImpact += impactContribution * 100;
         industryMap[industryName].gdpWeight = Math.max(industryMap[industryName].gdpWeight, industryData.gdpWeight);
 
@@ -135,7 +187,7 @@ class CascadeEngine {
           commodity: commodityKey,
           commodityName: commImpact.name,
           commodityColor: commImpact.color,
-          passThroughCoeff: industryData.passThroughCoeff,
+          passThroughCoeff: ptCoeff,
           contribution: impactContribution * 100
         });
       }
@@ -359,5 +411,48 @@ class CascadeEngine {
     }
 
     return { nodes, links };
+  }
+
+  // ── Heatmap data ────────────────────────────────────────────────────────────
+  _buildHeatmapData(commodityImpacts, industryImpacts) {
+    const cols = Object.keys(COMMODITIES).filter(k => commodityImpacts[k]?.effectiveShortage > 0).map(k => commodityImpacts[k]);
+    const matrix = [];
+
+    for (const industry of industryImpacts) {
+      if (industry.totalImpact < 1.0) continue;
+      const row = { industry: industry.name, cells: [] };
+      let maxVal = 0;
+      for (const col of cols) {
+        const source = industry.sources.find(s => s.commodity === col.key);
+        const val = source ? source.contribution : 0;
+        row.cells.push({ commodity: col.name, commodityKey: col.key, value: val, color: col.color });
+        if (val > maxVal) maxVal = val;
+      }
+      if (maxVal > 0) matrix.push(row);
+    }
+    return { cols, matrix };
+  }
+
+  // ── KPI Summary ─────────────────────────────────────────────────────────────
+  _computeKPIs(commodities, countries, food) {
+    const top10 = countries.slice(0, 10);
+    const sumDrag = top10.reduce((sum, c) => sum + (c.gdpTrillions * c.gdpDragPct), 0);
+    const sumGDP = top10.reduce((sum, c) => sum + c.gdpTrillions, 0);
+    const globalDrag = sumGDP > 0 ? (sumDrag / sumGDP) : 0;
+
+    let maxPriceShock = 0;
+    let maxShockName = '';
+    for (const c of Object.values(commodities)) {
+      if (c.priceIncreasePct > maxPriceShock) { 
+        maxPriceShock = c.priceIncreasePct; maxShockName = c.name; 
+      }
+    }
+
+    return {
+      globalDragPct: globalDrag,
+      foodSeverity: food.severity,
+      maxShockName,
+      maxShockPct: maxPriceShock
+    };
   }
 }
