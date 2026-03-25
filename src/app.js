@@ -29,7 +29,7 @@ function setupWelcomeScreen() {
       document.getElementById('app-wrapper').style.display = 'flex';
       
       // Initialize main app
-      renderPresets();
+      renderNarrativeScenarios();
       renderSliders();
       renderMitigations();
       initMap();
@@ -37,6 +37,7 @@ function setupWelcomeScreen() {
       setupPlayback();
       setupSensitivity();
       setupRefreshButton();
+      setupAdvancedToggle();
       startAutoRefresh();
 
       // Start with Current Blockade
@@ -55,18 +56,73 @@ function setupWelcomeScreen() {
 }
 
 // ── PRESETS ──────────────────────────────────────────────────────────────────
-function renderPresets() {
-  const container = document.getElementById('presets-container');
+function renderNarrativeScenarios() {
+  const container = document.getElementById('narrative-scenarios');
+  if (!container) return;
   container.innerHTML = '';
-
-  for (const [name, preset] of Object.entries(PRESETS)) {
-    const btn = document.createElement('button');
-    btn.className = 'preset-btn';
-    btn.textContent = name;
-    btn.title = preset.description;
-    btn.addEventListener('click', () => applyPreset(name));
-    container.appendChild(btn);
-  }
+ 
+  // Select 4 primary narrative scenarios
+  const narrativeKeys = ['Current Blockade', 'The Suez Alternative', 'Agricultural Collapse', 'Full Blockade'];
+  
+  narrativeKeys.forEach(name => {
+    const preset = PRESETS[name];
+    if (!preset) return;
+ 
+    const iconMap = {
+      'Current Blockade': '⚓',
+      'The Suez Alternative': '🚢',
+      'Agricultural Collapse': '🌾',
+      'Full Blockade': '🚫'
+    };
+ 
+    const card = document.createElement('div');
+    card.className = 'scenario-card';
+    if (currentPreset === name) card.classList.add('active');
+    card.setAttribute('data-preset', name);
+ 
+    card.innerHTML = `
+      <div class="scenario-card-icon">${iconMap[name] || '📊'}</div>
+      <div class="scenario-card-body">
+        <h3>${name}</h3>
+        <p>${preset.description.split('(')[0].trim()}</p>
+      </div>
+    `;
+ 
+    card.addEventListener('click', () => {
+      applyPreset(name);
+      updateNarrativeText(name);
+    });
+    container.appendChild(card);
+  });
+}
+ 
+function updateNarrativeText(name) {
+  const titleEl = document.getElementById('active-scenario-name');
+  const descEl = document.getElementById('narrative-description');
+  if (titleEl) titleEl.textContent = name;
+  if (descEl) descEl.textContent = PRESETS[name].description;
+ 
+  document.querySelectorAll('.scenario-card').forEach(card => {
+    card.classList.toggle('active', card.getAttribute('data-preset') === name);
+  });
+}
+ 
+function setupAdvancedToggle() {
+  const btn = document.getElementById('advanced-toggle-btn');
+  const panel = document.getElementById('advanced-analytics');
+  if (!btn || !panel) return;
+ 
+  btn.addEventListener('click', () => {
+    const isHidden = panel.style.display === 'none';
+    panel.style.display = isHidden ? 'block' : 'none';
+    btn.innerHTML = isHidden 
+      ? '✨ Hide Advanced Analysis' 
+      : '✨ Show Advanced Analysis & Cascade Data';
+    
+    if (isHidden) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
 }
 
 function applyPreset(name) {

@@ -99,6 +99,21 @@
 
     <!-- ─── MAIN CONTENT ───────────────────────────────────────────── -->
     <main id="main-content" class="main-content">
+ 
+      <!-- ─── NARRATIVE HUB ─────────────────────────────────────────── -->
+      <section class="content-section narrative-hub">
+        <div class="narrative-message">
+          <h2 class="narrative-title">Scenario: <span id="active-scenario-name">Current Blockade</span></h2>
+          <p id="narrative-description" class="narrative-text">
+            Maritime traffic remains stalled. Global markets are pricing in a prolonged closure of the Strait. 
+            Energy costs are climbing while fertilizer shortages begin to threaten future crop yields.
+          </p>
+        </div>
+        
+        <div class="scenario-selector-grid" id="narrative-scenarios">
+          <!-- Populated by JS -->
+        </div>
+      </section>
 
       <!-- KPI Scorecard Row -->
       <section class="content-section kpi-section">
@@ -107,20 +122,48 @@
         </div>
       </section>
 
-      <!-- Commodity Cards Row -->
-      <section class="content-section">
-        <h2 class="section-title">📦 Commodity Impact Overview</h2>
-        <div id="commodity-cards" class="commodity-cards-grid"></div>
-      </section>
+      <div class="advanced-toggle-wrapper">
+        <button id="advanced-toggle-btn" class="advanced-toggle-btn">
+          ✨ Show Advanced Analysis & Cascade Data
+        </button>
+      </div>
+ 
+      <div id="advanced-analytics" style="display: none;">
+        <!-- Commodity Cards Row -->
+        <section class="content-section">
+          <h2 class="section-title">📦 Commodity Impact Overview</h2>
+          <div id="commodity-cards" class="commodity-cards-grid"></div>
+        </section>
+ 
+        <!-- Sankey Diagram -->
+        <section class="content-section sankey-section">
+          <h2 class="section-title">🔀 Supply Chain Cascade Flow</h2>
+          <p class="section-desc">How commodity shortages cascade through industries to economic impacts</p>
+          <div id="sankey-container" class="sankey-container">
+            <div class="sankey-placeholder">Adjust shortages to see cascade</div>
+          </div>
+        </section>
 
-      <!-- Sankey Diagram -->
-      <section class="content-section sankey-section">
-        <h2 class="section-title">🔀 Supply Chain Cascade Flow</h2>
-        <p class="section-desc">How commodity shortages cascade through industries to economic impacts</p>
-        <div id="sankey-container" class="sankey-container">
-          <div class="sankey-placeholder">Adjust shortage sliders to see the cascade flow</div>
-        </div>
-      </section>
+        <section class="content-section">
+          <h2 class="section-title">🗺️ Possible Response Routes</h2>
+          <div class="routes-container">
+             <div class="route-card">
+               <div class="route-header">
+                 <span class="route-id">Route Alpha</span>
+                 <span class="route-status">Available</span>
+               </div>
+               <p>Strategic Reroute via Suez/Cape. Increases costs by 15-20% but secures 70% of volume.</p>
+             </div>
+             <div class="route-card locked">
+               <div class="route-header">
+                 <span class="route-id">Route Beta</span>
+                 <span class="route-status">Contingent</span>
+               </div>
+               <p>Overland Rail Corridor. Requires diplomatic clearance across 3 transits.</p>
+             </div>
+          </div>
+        </section>
+      </div>
 
       <!-- Two-column: Country Table + Map (Swapped for better visibility) -->
       <section class="content-section split-section">
