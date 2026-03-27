@@ -38,6 +38,7 @@ function setupWelcomeScreen() {
       setupSensitivity();
       setupRefreshButton();
       setupAdvancedToggle();
+      setupGlossaryInteractivity();
       startAutoRefresh();
 
       // Start with Current Blockade
@@ -754,8 +755,8 @@ function renderKPIs(kpis) {
   const foodColor = sevColorMap[kpis.foodSeverity] || '#94A3B8';
   
   container.innerHTML = `
-    <div class="kpi-card has-tooltip" style="--kpi-color: ${gdpColor}" data-tooltip="Global GDP Drag: The average projected growth reduction for the world's 5 largest economies (USA, China, EU, Japan, India). A conservative estimate of global economic friction.">
-      <span class="kpi-title">Top 5 Economies GDP Drag ⓘ</span>
+    <div class="kpi-card has-tooltip" style="--kpi-color: ${gdpColor}" data-tooltip="Global GDP Drag: A weighted average across all 21 tracked economies based on their individual GDP (USD Trillions). This provides a comprehensive view of global economic impact.">
+      <span class="kpi-title">Global GDP Drag (Weighted) ⓘ</span>
       <span class="kpi-value" style="color: ${gdpColor}">-${(kpis.globalDragPct * 100).toFixed(2)}%</span>
     </div>
     <div class="kpi-card has-tooltip" style="--kpi-color: ${priceColor}" data-tooltip="Max Price Shock: The highest projected price spike among tracked commodities, driven by supply inelasticity and Strait dependency.">
@@ -795,4 +796,32 @@ function renderSensitivity(sensitivity) {
   }
 }
 
-
+function setupGlossaryInteractivity() {
+  const highlights = document.querySelectorAll('.term-highlight');
+  highlights.forEach(el => {
+    el.addEventListener('click', () => {
+      const term = el.textContent.trim();
+      const glossaryItems = document.querySelectorAll('.glossary-item');
+      
+      let targetFound = false;
+      glossaryItems.forEach(item => {
+        const glossaryTerm = item.querySelector('.glossary-term').textContent.trim();
+        if (term.toLowerCase().includes(glossaryTerm.toLowerCase()) || 
+            glossaryTerm.toLowerCase().includes(term.toLowerCase())) {
+          
+          targetFound = true;
+          item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          item.classList.add('highlight-active', 'flash-highlight');
+          
+          setTimeout(() => {
+            item.classList.remove('highlight-active', 'flash-highlight');
+          }, 3000);
+        }
+      });
+      
+      if (!targetFound) {
+        console.warn(`Glossary term not found for: ${term}`);
+      }
+    });
+  });
+}

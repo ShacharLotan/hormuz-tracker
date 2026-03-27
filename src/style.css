@@ -1648,3 +1648,38 @@ details[open] .methodology-title:after {
   width: 250px; /* Slightly wider for KPIs */
 }
 
+/* ─── GLOSSARY INTERACTIVITY ─────────────────────────────────────── */
+.term-highlight {
+  color: #3B82F6;
+  text-decoration: underline dotted;
+  cursor: help;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.term-highlight:hover {
+  color: #60A5FA;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.glossary-item {
+  transition: all 0.4s ease;
+  border: 1px solid var(--border-subtle);
+}
+
+.glossary-item.highlight-active {
+  border-color: #3B82F6;
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+@keyframes flash-blue {
+  0% { background: transparent; }
+  50% { background: rgba(59, 130, 246, 0.3); }
+  100% { background: transparent; }
+}
+
+.flash-highlight {
+  animation: flash-blue 1s ease-in-out 2;
+}
