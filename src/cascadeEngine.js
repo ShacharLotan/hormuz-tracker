@@ -440,11 +440,13 @@ class CascadeEngine {
 
   // ── KPI Summary ─────────────────────────────────────────────────────────────
   _computeKPIs(commodities, countries, food) {
-    // Weighted Average of Global GDP Drag: (Sum of each country's GDP * its Drag %) / (Sum of all countries' GDP)
-    // NOT accumulative. This represents the total global economic shock.
-    const sumDrag = countries.reduce((sum, c) => sum + (c.gdpTrillions * c.gdpDragPct), 0);
-    const sumGDP = countries.reduce((sum, c) => sum + c.gdpTrillions, 0);
-    const globalDrag = sumGDP > 0 ? (sumDrag / sumGDP) : 0;
+    // Conservative Global GDP Drag: Average of the top 5 largest economies
+    // (USA, China, EU, Japan, India). This avoids skewing by smaller, hyper-vulnerable hubs.
+    const top5 = [...countries]
+      .sort((a, b) => b.gdpTrillions - a.gdpTrillions)
+      .slice(0, 5);
+    
+    const globalDrag = top5.reduce((sum, c) => sum + c.gdpDragPct, 0) / top5.length;
 
     let maxPriceShock = 0;
     let maxShockName = '';

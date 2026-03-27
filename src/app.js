@@ -276,20 +276,20 @@ function renderCommodityCards(commodityImpacts) {
       </div>
       <span class="card-severity severity-${impact.severity}">${impact.severity}</span>
       <div class="card-stats">
-        <div class="card-stat-row">
-          <span class="card-stat-label">Shortage</span>
+        <div class="card-stat-row" title="Physical supply reduction relative to global baseline demand.">
+          <span class="card-stat-label">Shortage ⓘ</span>
           <span class="card-stat-value">${impact.shortagePct.toFixed(0)}%</span>
         </div>
-        <div class="card-stat-row">
-          <span class="card-stat-label">Effective loss</span>
+        <div class="card-stat-row" title="Effective loss after accounting for strategic reserves and immediate substitution effects.">
+          <span class="card-stat-label">Effective loss ⓘ</span>
           <span class="card-stat-value">${impact.effectiveShortage.toFixed(1)}%</span>
         </div>
-        <div class="card-stat-row">
-          <span class="card-stat-label">Price impact</span>
+        <div class="card-stat-row" title="Projected price increase calculated using Mid-point Price Elasticity of Demand (PED).">
+          <span class="card-stat-label">Price impact ⓘ</span>
           <span class="card-stat-value price-change-positive">${priceChangeStr}</span>
         </div>
-        <div class="card-stat-row">
-          <span class="card-stat-label">Est. price</span>
+        <div class="card-stat-row" title="Estimated market price per ${commodity.unit} during the blockade window.">
+          <span class="card-stat-label">Est. price ⓘ</span>
           <span class="card-stat-value">${impact.estimatedPrice.toLocaleString()} ${commodity.unit}</span>
         </div>
       </div>
@@ -754,16 +754,16 @@ function renderKPIs(kpis) {
   const foodColor = sevColorMap[kpis.foodSeverity] || '#94A3B8';
   
   container.innerHTML = `
-    <div class="kpi-card" style="--kpi-color: ${gdpColor}">
-      <span class="kpi-title">Global GDP Drag (Top 10)</span>
+    <div class="kpi-card" style="--kpi-color: ${gdpColor}" title="Global GDP Drag: The average projected growth reduction for the world's 5 largest economies (USA, China, EU, Japan, India). A conservative estimate of global economic friction.">
+      <span class="kpi-title">Global GDP Drag ⓘ</span>
       <span class="kpi-value" style="color: ${gdpColor}">-${(kpis.globalDragPct * 100).toFixed(2)}%</span>
     </div>
-    <div class="kpi-card" style="--kpi-color: ${priceColor}">
-      <span class="kpi-title">Max Price Shock (${kpis.maxShockName})</span>
+    <div class="kpi-card" style="--kpi-color: ${priceColor}" title="Max Price Shock: The highest projected price spike among tracked commodities, driven by supply inelasticity and Strait dependency.">
+      <span class="kpi-title">Max Price Shock (${kpis.maxShockName}) ⓘ</span>
       <span class="kpi-value" style="color: ${priceColor}">+${kpis.maxShockPct.toFixed(0)}%</span>
     </div>
-    <div class="kpi-card" style="--kpi-color: ${foodColor}">
-      <span class="kpi-title">Food System Severity</span>
+    <div class="kpi-card" style="--kpi-color: ${foodColor}" title="Food System Severity: A combined metric of fertilizer shortages, crop yield reductions, and energy-driven transportation costs.">
+      <span class="kpi-title">Food System Severity ⓘ</span>
       <span class="kpi-value" style="color: ${foodColor}; text-transform: capitalize;">${kpis.foodSeverity}</span>
     </div>
   `;
