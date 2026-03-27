@@ -281,7 +281,7 @@ class CascadeEngine {
         pinned: country.pinned || false,
         isExporter: country.isExporter || false,
         overallScore: Math.round(normalizedScore * 10) / 10,
-        gdpDragPct: Math.round(gdpDragPct * 100) / 100,
+        gdpDragPct: Math.round(gdpDragPct * 10000) / 10000,
         dependencyIndex: Math.round(avgDependency * 100) / 100,
         vulnerableSectors: vulnerableSectors.sort((a, b) => b.impact - a.impact).slice(0, 4),
         commodityExposures
