@@ -755,8 +755,8 @@ function renderKPIs(kpis) {
   const foodColor = sevColorMap[kpis.foodSeverity] || '#94A3B8';
   
   container.innerHTML = `
-    <div class="kpi-card has-tooltip" style="--kpi-color: ${gdpColor}" data-tooltip="Global GDP Drag: A weighted average across all 21 tracked economies based on their individual GDP (USD Trillions). This provides a comprehensive view of global economic impact.">
-      <span class="kpi-title">Global GDP Drag (Weighted) ⓘ</span>
+    <div class="kpi-card has-tooltip" style="--kpi-color: ${gdpColor}" data-tooltip="Global GDP Drag: The average projected growth reduction for the world's 5 largest economies (USA, China, EU, Japan, India). A conservative estimate of global economic friction.">
+      <span class="kpi-title">Top 5 Economies GDP Drag ⓘ</span>
       <span class="kpi-value" style="color: ${gdpColor}">-${(kpis.globalDragPct * 100).toFixed(2)}%</span>
     </div>
     <div class="kpi-card has-tooltip" style="--kpi-color: ${priceColor}" data-tooltip="Max Price Shock: The highest projected price spike among tracked commodities, driven by supply inelasticity and Strait dependency.">
